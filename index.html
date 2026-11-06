@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghost Pomodoro — 幽灵番茄钟 | Cursed Tasks, Freed Souls</title>
+<meta name="description" content="A haunted Pomodoro timer: curse your tasks, focus with a ghost companion, free souls one Pomodoro at a time. Built with Kiro for Kiroween 2026, Costume Contest.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="fog fog-1" aria-hidden="true"></div>
+<div class="fog fog-2" aria-hidden="true"></div>
+<div class="fog fog-3" aria-hidden="true"></div>
+<div class="float-ghosts" aria-hidden="true">
+  <span class="float-ghost g1">👻</span>
+  <span class="float-ghost g2">🦇</span>
+  <span class="float-ghost g3">👻</span>
+  <span class="float-ghost g4">🎃</span>
+  <span class="float-ghost g5">🦇</span>
+</div>
+<div class="cobweb cobweb-left" aria-hidden="true">🕸️</div>
+<div class="cobweb cobweb-right" aria-hidden="true">🕸️</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div>
+      <p class="eyebrow">🎃 Kiroween 2026 &middot; Costume Contest &middot; Built with Kiro</p>
+      <h1><span class="title-ghost">👻</span> Ghost Pomodoro</h1>
+      <p class="subtitle">幽灵番茄钟 — Curse a task. Focus. Free its soul.</p>
+    </div>
+    <div class="header-stats" aria-label="Your soul stats">
+      <div class="stat-pill"><span class="stat-label">Souls</span><strong id="soulsCount">0</strong><span>✦</span></div>
+      <div class="stat-pill"><span class="stat-label">Streak</span><strong id="streakCount">0 days</strong><span>🔥</span></div>
+      <button id="soundToggle" class="btn btn-ghost" type="button" aria-pressed="true" title="Toggle sound">🔔 Sound: On</button>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+  <!-- LEFT: Timer + Ghost companion -->
+  <section class="card timer-card" aria-labelledby="timer-heading">
+    <div class="card-top">
+      <h2 id="timer-heading">The Blood-Moon Timer</h2>
+      <span class="mode-badge" id="modeBadge">Focus</span>
+    </div>
+
+    <div class="mode-tabs" role="tablist" aria-label="Timer mode">
+      <button class="mode-tab active" data-mode="focus" type="button" role="tab" aria-selected="true">🩸 Focus</button>
+      <button class="mode-tab" data-mode="short" type="button" role="tab" aria-selected="false">🕯️ Short Break</button>
+      <button class="mode-tab" data-mode="long" type="button" role="tab" aria-selected="false">🌕 Long Break</button>
+    </div>
+
+    <div class="timer-wrap">
+      <div class="moon" aria-hidden="true"></div>
+      <svg class="ring" viewBox="0 0 260 260" aria-hidden="true">
+        <circle class="ring-track" cx="130" cy="130" r="112"></circle>
+        <circle class="ring-progress" id="ringProgress" cx="130" cy="130" r="112"></circle>
+      </svg>
+      <div class="timer-centre">
+        <div class="timer-time" id="timerTime" aria-live="polite">25:00</div>
+        <div class="timer-label" id="timerLabel">Ready to haunt your to-do list</div>
+        <div class="timer-task" id="timerTask">No task selected — pick one below 👇</div>
+      </div>
+    </div>
+
+    <div class="focus-dots" id="focusDots" aria-label="Focus sessions completed in this cycle">
+      <span>●</span><span>●</span><span>●</span><span>●</span>
+    </div>
+    <p class="cycle-note" id="cycleNote">Complete 4 focuses for a long break. 0 / 4 done.</p>
+
+    <div class="timer-controls">
+      <button id="startPauseBtn" class="btn btn-primary" type="button">▶ Start Focus</button>
+      <button id="resetBtn" class="btn btn-secondary" type="button">↺ Reset</button>
+      <button id="skipBtn" class="btn btn-secondary" type="button">⏭ Skip</button>
+    </div>
+
+    <div class="settings-row">
+      <label for="focusDuration">Focus length
+        <select id="focusDuration">
+          <option value="900">15 min</option>
+          <option value="1500" selected>25 min</option>
+          <option value="3000">50 min</option>
+          <option value="25">Demo: 25 sec — for judges &amp; video</option>
+        </select>
+      </label>
+      <label for="shortBreak">Short break
+        <select id="shortBreak">
+          <option value="300" selected>5 min</option>
+          <option value="600">10 min</option>
+        </select>
+      </label>
+      <label for="longBreak">Long break
+        <select id="longBreak">
+          <option value="900" selected>15 min</option>
+          <option value="1200">20 min</option>
+        </select>
+      </label>
+    </div>
+    <p class="demo-note" id="demoNote" hidden>🧪 Demo mode: 25-second focus, 10-second short break, 15-second long break — so judges can see a full cycle in under a minute.</p>
+
+    <!-- Ghost companion -->
+    <div class="ghost-panel" id="ghostPanel">
+      <div class="ghost-avatar" id="ghostAvatar" aria-hidden="true">😴</div>
+      <div class="ghost-info">
+        <div class="ghost-name-row">
+          <strong id="ghostName">Boo the Wisp</strong>
+          <span class="ghost-level" id="ghostLevel">Lv. 1 · Wisp</span>
+        </div>
+        <p class="ghost-mood" id="ghostMood">Sleepy… curse a task and press Start to wake me up.</p>
+        <div class="xp-bar" aria-label="Ghost experience"><div class="xp-fill" id="xpFill" style="width: 0%"></div></div>
+        <p class="xp-text" id="xpText">0 XP — 100 XP to Baby Ghost</p>
+      </div>
+    </div>
+    <p class="haunt-warning" id="hauntWarning" hidden>😡 Boo is angry! You abandoned a focus early. The fog thickens…</p>
+  </section>
+
+  <!-- RIGHT: Tasks + stats -->
+  <section class="right-column">
+    <section class="card tasks-card" aria-labelledby="tasks-heading">
+      <div class="card-top">
+        <h2 id="tasks-heading">📜 Cursed Tasks</h2>
+        <span class="count-badge" id="taskCount">0 tasks</span>
+      </div>
+      <p class="card-hint">Every task is a trapped soul. Give it a curse level and a Pomodoro estimate — finish the Pomodoros and its soul is freed.</p>
+
+      <form id="addTaskForm" class="add-form">
+        <label class="grow">
+          <span class="sr-only">Task title</span>
+          <input id="taskTitle" type="text" maxlength="120" placeholder="e.g. Finish UNED essay draft…" required>
+        </label>
+        <label>Curse
+          <select id="taskCurse">
+            <option value="1">💀 1 skull</option>
+            <option value="2" selected>💀💀 2 skulls</option>
+            <option value="3">💀💀💀 3 skulls</option>
+          </select>
+        </label>
+        <label>Est. 🍅
+          <input id="taskEstimate" type="number" min="1" max="8" value="2" aria-label="Estimated Pomodoros">
+        </label>
+        <button class="btn btn-primary" type="submit">+ Curse it</button>
+      </form>
+
+      <div class="filters" role="group" aria-label="Filter tasks">
+        <button class="filter-btn active" data-filter="all" type="button">All</button>
+        <button class="filter-btn" data-filter="active" type="button">Active</button>
+        <button class="filter-btn" data-filter="freed" type="button">Freed ✨</button>
+      </div>
+
+      <ul class="task-list" id="taskList"></ul>
+      <p class="empty-state" id="emptyState">No cursed tasks yet. The graveyard is quiet… for now. 👻<br>Add your first task above to wake Boo.</p>
+    </section>
+
+    <section class="card stats-card" aria-labelledby="stats-heading">
+      <h2 id="stats-heading">🏆 Haunting Record</h2>
+      <div class="stats-grid">
+        <div class="stat-box"><strong id="statFocusMin">0</strong><span>focus minutes</span></div>
+        <div class="stat-box"><strong id="statFreed">0</strong><span>souls freed</span></div>
+        <div class="stat-box"><strong id="statSessions">0</strong><span>focus sessions</span></div>
+        <div class="stat-box"><strong id="statHaunts">0</strong><span>haunts caused</span></div>
+      </div>
+      <div class="evolution">
+        <p><strong>Ghost evolution:</strong> <span id="evolutionPath">Wisp → Baby Ghost → Poltergeist → Phantom Lord</span></p>
+        <div class="evo-steps" aria-hidden="true">
+          <span class="evo-step done">👻 Wisp</span><span>→</span>
+          <span class="evo-step" id="evo2">👶 Baby Ghost</span><span>→</span>
+          <span class="evo-step" id="evo3">😈 Poltergeist</span><span>→</span>
+          <span class="evo-step" id="evo4">👑 Phantom Lord</span>
+        </div>
+      </div>
+      <div class="share-row">
+        <button id="shareBtn" class="btn btn-secondary" type="button">📋 Copy my haunting summary</button>
+        <button id="resetDayBtn" class="btn btn-ghost" type="button">↺ Reset all data</button>
+      </div>
+      <p class="save-note">Everything is saved in your browser (localStorage). No account, no server, no login — judges can start in one click.</p>
+    </section>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading">🕯️ How to play</h2>
+      <ol class="how-list">
+        <li><strong>Curse a task</strong> — add it with a skull level and Pomodoro estimate.</li>
+        <li><strong>Click a task to select it</strong>, then press Start Focus.</li>
+        <li><strong>Finish the focus</strong> — Boo cheers, you earn souls and XP, the task gains a Pomodoro.</li>
+        <li><strong>Free the soul</strong> — when its Pomodoros are done, the task is freed. Abandon a focus early and Boo haunts you instead.</li>
+      </ol>
+      <p class="how-note">Tip for judges: pick <em>Demo: 25 sec</em> above to see a full focus → break → celebration cycle in under a minute.</p>
+    </section>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <p>🎃 Ghost Pomodoro — built with Kiro (specs, steering, hooks, MCP) for Kiroween 2026, Costume Contest. No login. No tracking. Your ghosts stay on your device.</p>
+  <p><a href="README.md">README</a> · <a href="SUBMISSION_CHECKLIST.md">Submission checklist</a> · <a href="LICENSE">MIT License</a> · Made by ZF, UNED student, Spain</p>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="celebration" id="celebration" aria-hidden="true"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

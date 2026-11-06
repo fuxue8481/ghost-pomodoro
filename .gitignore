@@ -1,0 +1,9 @@
+# Ghost Pomodoro — .gitignore
+# IMPORTANT: do NOT ignore .kiro/ — Devpost requires /.kiro at the repo root.
+# The lines below are the only ignores.
+
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+dist/
